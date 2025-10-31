@@ -7,7 +7,7 @@ Time will be taken from system clock, in edit the relative positions will be mor
 ## Script Help
 
 	$ ./srt-notes.py -h
-	usage: srt-notes [-h] [-s SRT] [-t] ...
+	usage: srt-notes [-h] [-s SRT] [-t] [-w] [-i IP] [-p PORT] ...
 
 	Note taking tool for video editing output
 
@@ -15,13 +15,14 @@ Time will be taken from system clock, in edit the relative positions will be mor
 	message
 
 	options:
-	-h, --help         show this help message and exit
-	-s SRT, --srt SRT  SRT file for converted data
-	-t, --text         Return text from SRT file
+	-h, --help       show this help message and exit
+	-s, --srt SRT    SRT file for converted data
+	-t, --text       Return text from SRT file
+	-w, --web        Start web server
+	-i, --ip IP      Web server listening IP
+	-p, --port PORT  Web server listening IP
 
 
-## Roadmap
 
-
-### Web
-A multithreaded web interface that can both read and write to the SRT. The goal being to embed the web interface in OBS and have it emmit sound onto a secondary audio track when another web client adds a new time to the SRT. Should also allow submitting no text to trigger sound and then editing text content later. This allows for critcal timing to be maintained and adding context later.
+## Web
+A multithreaded web interface that can both read and write to the SRT. You can embed the web interface in OBS and have it emmit sound onto a secondary audio track when another web client adds a new time to the SRT. Existing entries can also be edited after submission to add additional lines or to submit time critical blank entries and add a description later.
