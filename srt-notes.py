@@ -7,6 +7,164 @@ import sys
 import os
 import json
 from pprint import pprint
+import asyncio
+import signal
+from multiprocessing import Process
+
+class WebInterface(object):
+    try:
+        # External Modules
+        from flask import Flask
+        from flask import Response
+        from flask import request
+        from flask import send_file
+        from flask import redirect
+        from flask import make_response
+        from flask import send_from_directory
+    except Exception as e:
+            print("Need to install Python module [flask]")
+            sys.exit(1)
+    """Web interface for managing rips
+
+    """
+
+    def __init__(self,ip,port,srt):
+
+        self.host_dir=os.path.realpath(__file__).replace(os.path.basename(__file__),"")
+        self.app = self.Flask("SRT Notes")
+        self.app.logger.disabled = True
+        #log = logging.getLogger('werkzeug')
+        #log.disabled = True
+
+        # Static content
+        self.app.static_folder=self.host_dir+"http/static"
+        self.app.static_url_path='/static/'
+
+        # Define routes in class to use with flask
+        self.app.add_url_rule('/','home', self.index)
+        # Define routes in class to use with flask
+        self.app.add_url_rule('/add','add_title', self.add_title,methods=["POST"])
+        self.app.add_url_rule('/update','update_title', self.update_title,methods=["POST"])
+        self.app.add_url_rule('/srt.json','json', self.json)
+
+
+        self.host = ip
+        self.port = port
+        self.srt = srt
+
+
+
+    async def start(self):
+        """ Run Flask in a process thread that is non-blocking """
+        print("Starting Flask")
+        self.web_thread = Process(target=self.app.run,
+            kwargs={
+                "host":self.host,
+                "port":self.port,
+                "debug":True,
+                "use_reloader":False
+                }
+            )
+        self.web_thread.start()
+
+    def stop(self):
+        """ Send SIGKILL and join thread to end Flask server """
+        if hasattr(self, "web_thread") and self.web_thread is not None:
+            self.web_thread.terminate()
+            self.web_thread.join()
+        if hasattr(self, "rip_thread"):
+            self.rip_thread.terminate()
+            self.rip_thread.join()
+
+
+    def index(self):
+        """ Simple class function to send HTML to browser """
+        return f"""
+        <h1>SRT Notes: {self.srt}</h1>
+
+<input id="text" name="text">
+<input type="button" id="new_title" value="add" />
+
+<div id=titles>
+
+</div>
+
+<script type="text/javascript" src="/static/update.js"> </script>
+"""
+
+
+    def add_title(self):
+        srt = SRT(self.srt)
+        data = self.request.get_json()
+        pprint(data)
+        srt.add(text=data["text"])
+        srt.save()
+        return "sure"
+
+    def update_title(self):
+        srt = SRT(self.srt)
+        data = self.request.get_json()
+        pprint(data)
+        start=Title.srtToDatetime(data['start'])
+        srt.update(start=start,text=data["text"])
+        srt.save()
+        return "sure"
+
+    def json(self):
+        """ Simple class function to send HTML to browser """
+        srt = SRT(self.srt)
+        data=[]
+        for title in srt.getTitles():
+            data.append(title.toJson())
+        return self.Response(json.dumps(data), mimetype='application/json')
+
+
+# ------ Async Server Handler ------
+
+global loop_state
+global server
+loop_state = True
+server = None
+
+
+async def asyncLoop():
+    """ Blocking main loop to provide time for async tasks to run"""
+    print('Blocking main loop')
+    global loop_state
+    while loop_state:
+        await asyncio.sleep(1)
+
+
+def exit_handler(sig, frame):
+    """ Handle CTRL-C to gracefully end program and API connections """
+    global loop_state
+    print('You pressed Ctrl+C!')
+    loop_state = False
+    server.stop()
+
+
+# ------ Async Server Handler ------
+
+
+
+async def startWeb(ip,port,srt):
+
+    # Internal Modules
+    global server
+    server = WebInterface(ip,port,srt)
+
+    """ Start connections to async modules """
+
+    # Setup CTRL-C signal to end programm
+    signal.signal(signal.SIGINT, exit_handler)
+    print('Press Ctrl+C to exit program')
+
+    # Start async modules
+    L = await asyncio.gather(
+        server.start(),
+        asyncLoop()
+    )
+
 
 class SRT(object):
     """Class to add time based notes as SRT
@@ -63,6 +221,7 @@ class SRT(object):
                 output.write(title.toString())
                 output.write("\n")
                 i+=1
+            output.write("\n")
 
 
 
@@ -75,6 +234,13 @@ class SRT(object):
 
         self.titles.append(Title(start=start,end=end,text=text))
 
+
+    def update(self,start=None,text=""):
+        for title in self.titles:
+            if title.start == start:
+                title.text = text
+
+
     def debug(self):
         for title in self.titles:
             print(title.toString())
@@ -82,6 +248,9 @@ class SRT(object):
     def getText(self):
         for title in self.titles:
             print(title.text)
+
+    def getTitles(self):
+        return self.titles
 
 class Title(object):
     def __init__(self,start=None,end=None,text="",string=None):
@@ -99,6 +268,18 @@ class Title(object):
 
     def toString(self):
         return f'{Title.datetimeToSrt(self.start)} --> {Title.datetimeToSrt(self.end)}\n{self.text}'
+
+    def toJson(self):
+        return {
+            "start": Title.datetimeToSrt(self.start),
+            "end": Title.datetimeToSrt(self.end),
+            "text": self.text
+            }
+
+    def fromJson(self,data):
+        self.start=Title.srtToDatetime(data["start"])
+        self.end=Title.srtToDatetime(data["end"])
+        self.text=data["text"]
 
     def fromString(self,string):
         self.start=None
@@ -127,8 +308,19 @@ def main():
                     epilog='')
     parser.add_argument('-s', '--srt', help="SRT file for converted data", default=f"{str(datetime.datetime.now().date())}.srt")
     parser.add_argument('-t', '--text', help="Return text from SRT file", action='store_true')
+    parser.add_argument('-w', '--web', help="Start web server", action='store_true')
+    parser.add_argument('-i', '--ip', help="Web server listening IP", default="0.0.0.0")
+    parser.add_argument('-p', '--port', help="Web server listening IP", default="5001")
     parser.add_argument('message', help="", default=None, nargs=argparse.REMAINDER)
     args = parser.parse_args()
+
+
+
+    # Run web server
+    if args.web:
+        asyncio.run(startWeb(args.ip,args.port,args.srt))
+        sys.exit(0)
+
 
     srt = SRT(args.srt)
 
