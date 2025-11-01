@@ -79,17 +79,75 @@ class WebInterface(object):
 
     def index(self):
         """ Simple class function to send HTML to browser """
-        return f"""
-        <h1>SRT Notes: {self.srt}</h1>
+        return f"""<!DOCTYPE html>
+<html>
+<head>
+	<title> SRT Notes: {self.srt} </title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="HandheldFriendly" content="true" />
+	<style>
+body,html {{
+	font-family: sans-serif;
+	color: #ddd;
+	background-color: #111;
+}}
+h1 {{
+	color: #ddd;
+	margin: 0px;
+}}
+h5 {{
+	color: #ddd;
+	margin: 0px;
+	margin-top: 1em;
+}}
+.wide {{
+    display: block;
+	width: 100%;
+}}
+input[type="button"]  {{
+	background-color: #444;
+    box-sizing: border-box;
+	color: #fff;
+	border-top: solid 2px #555;
+	border-bottom: solid 2px #333;
+	border-right: solid 2px #454545;
+	border-left: solid 2px #353535;
+}}
+input[type="text"] {{
+	background-color: #222;
+    box-sizing: border-box;
+	color: #fff;
+	border: none;
+}}
+textarea {{
+	background-color: #333;
+    box-sizing: border-box;
+	border: none;
+	color: #fff;
+	resize: vertical;
+}}
+a,
+a:link,
+a:visited
+{{
+	color: #bbf; text-decoration: none;
+}}
+	</style>
+</head>
+<body>
+<h1>{self.srt}</h1>
 
-<input id="text" name="text">
-<input type="button" id="new_title" value="add" />
+<input type="text" class="wide" id="text" name="text" placeholder="Add note details here...">
+<input class="wide" type="button" id="new_title" value="add" />
 
 <div id=titles>
 
 </div>
+<a href="?alarm=1">Sound View</a>
 
 <script type="text/javascript" src="/static/update.js"> </script>
+</body>
+</html>
 """
 
 

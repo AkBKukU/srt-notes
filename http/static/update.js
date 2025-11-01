@@ -27,13 +27,15 @@ class Title {
 		form.appendChild(h5);
 		var textarea = document.createElement("textarea");
 		textarea.value = this.text;
-		textarea.id = "text"+this.start
+		textarea.id = "text"+this.start;
+		textarea.classList.add("wide");
 		form.appendChild(textarea);
 
 		var input = document.createElement("input");
-		input.type="button"
-		input.value="Update"
-		input.name=this.start
+		input.type="button";
+		input.classList.add("wide");
+		input.value="Update";
+		input.name=this.start;
 		input.onclick = function(event) {
 			console.log(event.target.name);
 			fetch("/update", {
@@ -64,12 +66,17 @@ function loadUpdate(event)
 		for (const title of data) {
 			if ( !times.includes(title["start"]))
 			{
-				var audio = new Audio('/static/beep.wav');
-				audio.play();
-				times.push(title["start"])
+				times.push(title["start"]);
 				t = new Title(start=title["start"],end=title["end"],text=title["text"])
 				titles=document.getElementById('titles');
 				titles.insertBefore(t.element(), titles.firstChild);
+
+				let params = new URLSearchParams(document.location.search);
+				if (params.get("alarm"))
+				{
+					var audio = new Audio('/static/beep.wav');
+					audio.play();
+				}
 			}
 		}
 	});
