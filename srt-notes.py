@@ -45,6 +45,7 @@ class WebInterface(object):
         # Define routes in class to use with flask
         self.app.add_url_rule('/add','add_title', self.add_title,methods=["POST"])
         self.app.add_url_rule('/update','update_title', self.update_title,methods=["POST"])
+        self.app.add_url_rule('/remove','remove_title', self.remove_title,methods=["POST"])
         self.app.add_url_rule('/srt.json','json', self.json)
 
 
@@ -110,8 +111,17 @@ input[type="button"]  {{
 	color: #fff;
 	border-top: solid 2px #555;
 	border-bottom: solid 2px #333;
-	border-right: solid 2px #454545;
-	border-left: solid 2px #353535;
+	border-right: solid 2px #353535;
+	border-left: solid 2px #454545;
+}}
+input[type="button"]:active  {{
+	background-color: #464;
+    box-sizing: border-box;
+	color: #fff;
+	border-top: solid 2px #333;
+	border-bottom: solid 2px #555;
+	border-right: solid 2px #353535;
+	border-left: solid 2px #454545;
 }}
 input[type="text"] {{
 	background-color: #222;
@@ -131,6 +141,10 @@ a:link,
 a:visited
 {{
 	color: #bbf; text-decoration: none;
+}}
+a.remove
+{{
+	color: #522; text-decoration: none;
 }}
 	</style>
 </head>
@@ -165,6 +179,15 @@ a:visited
         pprint(data)
         start=Title.srtToDatetime(data['start'])
         srt.update(start=start,text=data["text"])
+        srt.save()
+        return "sure"
+
+    def remove_title(self):
+        srt = SRT(self.srt)
+        data = self.request.get_json()
+        pprint(data)
+        start=Title.srtToDatetime(data['start'])
+        srt.remove(start=start)
         srt.save()
         return "sure"
 
@@ -299,16 +322,26 @@ class SRT(object):
                 title.text = text
 
 
+    def remove(self,start=None):
+        for i in range(len(self.titles)-1):
+            print("matching: "+str(i))
+            if self.titles[i].start == start:
+                self.titles.pop(i)
+
+
     def debug(self):
         for title in self.titles:
             print(title.toString())
+
 
     def getText(self):
         for title in self.titles:
             print(title.text)
 
+
     def getTitles(self):
         return self.titles
+
 
 class Title(object):
     def __init__(self,start=None,end=None,text="",string=None):

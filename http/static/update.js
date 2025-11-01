@@ -22,8 +22,30 @@ class Title {
 	{
 		var form = document.createElement("form");
 		form.classList.add("title-view");
+		form.id="form-"+this.start;
 		var h5 = document.createElement("h5");
-		h5.innerText = this.start;
+		var span = document.createElement("span");
+		span.innerText = this.start + " - ";
+		h5.appendChild(span);
+		var a = document.createElement("a");
+		a.innerText = "Remove";
+		a.name=this.start;
+		a.classList.add("remove");
+		a.onclick = function(event) {
+			console.log(event.target.name);
+			fetch("/remove", {
+				method: 'post',
+			headers: {
+				"Content-Type": "application/json",
+				'Accept':'application/json'
+			},
+			body: JSON.stringify({"start":event.target.name}),
+			}).then(() => {
+				// Do nothing
+				document.getElementById("form-"+event.target.name).remove();
+			});
+		};
+		h5.appendChild(a);
 		form.appendChild(h5);
 		var textarea = document.createElement("textarea");
 		textarea.value = this.text;
