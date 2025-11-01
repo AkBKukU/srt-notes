@@ -323,10 +323,13 @@ class SRT(object):
 
 
     def remove(self,start=None):
-        for i in range(len(self.titles)-1):
+        pprint(self.titles)
+        for i in range(len(self.titles)):
             print("matching: "+str(i))
+            print("matching: "+str(start)+" - "+str(self.titles[i].start))
             if self.titles[i].start == start:
                 self.titles.pop(i)
+                return
 
 
     def debug(self):
