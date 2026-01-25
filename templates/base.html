@@ -1,0 +1,24 @@
+<!doctype html>
+<head>
+	<title> SRT Notes: {{ data["srt-name"] }} </title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="HandheldFriendly" content="true" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  {% block head %}{% endblock %}
+
+</head>
+<body>
+<h1>{{ data["srt-name"] }}</h1>
+
+<input type="text" class="wide" id="text" name="text" placeholder="Add note details here...">
+<input class="wide" type="button" id="new_title" value="add" />
+
+<div id=titles>
+
+</div>
+<a href="?alarm=1">Sound View</a>
+
+<script type="text/javascript" src="/static/update.js"> </script>
+</body>
+{% block end %}{% endblock %}
