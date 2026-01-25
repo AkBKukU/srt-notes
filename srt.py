@@ -67,6 +67,14 @@ class SRT(object):
                 i+=1
             output.write("\n")
 
+    def get(self,start=None):
+        if start is None:
+            return self.titles[-1]
+        else:
+            for i in range(len(self.titles)):
+                print(f'{self.titles[i].start} == {start}')
+                if self.titles[i].start == start:
+                    return self.titles[i]
 
 
     def add(self,start=None,end=None,text=""):

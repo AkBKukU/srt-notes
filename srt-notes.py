@@ -28,6 +28,11 @@ except Exception as e:
 
 from srt import SRT, Title
 
+from websocket_interface import WebSocketClients, WebSocketHandler
+
+wsc = WebSocketClients()
+
+
 
 args=None
 
@@ -43,6 +48,12 @@ def create_app(args):
     app.static_folder=host_dir+"http/static"
     app.static_url_path='/static/'
 
+    @app.websocket("/ws")
+    @wsc.websocket_register()
+    async def ws(wsh):
+        await wsc.websocket_connect(wsh)
+        return
+
     @app.route("/")
     async def index():
         """ Simple class function to send HTML to browser """
@@ -56,6 +67,11 @@ def create_app(args):
         pprint(data)
         srt.add(text=data["text"])
         srt.save()
+
+        await wsc.websocket_broadcast({
+            "command":"add",
+            "srt":srt.get().toJson()
+        })
         return "sure"
 
     @app.route("/update", methods=("GET", "POST"))
@@ -67,6 +83,15 @@ def create_app(args):
         start=Title.srtToDatetime(data['start'])
         srt.update(start=start,text=data["text"])
         srt.save()
+
+        try:
+            await wsc.websocket_broadcast({
+                "command":"update",
+                "srt":srt.get(start).toJson()
+            })
+        except Exception as e:
+             print(e)
+
         return "sure"
 
     @app.route("/remove", methods=("GET", "POST"))

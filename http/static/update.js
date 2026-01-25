@@ -1,3 +1,39 @@
+
+class WebSocketCustom extends WebSocketHandler
+{
+websocket_message(data)
+{
+    try {
+        if(data.event == "broadcast")
+        {
+		switch (data.data.command) {
+			case "add":
+				console.log("Add: "+data.data.srt);
+				add_title(data.data.srt)
+				break;
+			case "update":
+				console.log("Upate: "+data.data.srt);
+				update_title(data.data.srt)
+				break;
+			default:
+				console.log(`Command not found ${data.data.command}.`);
+		}
+        }
+    } catch (error) {
+        alert("thing go bad");
+    }
+}
+
+}
+
+
+
+
+const socket = new WebSocketCustom("/ws");
+
+
+
+
 times=[]
 
 class Title {
@@ -81,6 +117,27 @@ class Title {
 	}
 }
 
+function update_title(title)
+{
+	document.getElementById("text"+title["start"]).value = title["text"];
+}
+
+function add_title(title)
+{
+	times.push(title["start"]);
+	t = new Title(start=title["start"],end=title["end"],text=title["text"])
+	titles=document.getElementById('titles');
+	titles.insertBefore(t.element(), titles.firstChild);
+
+	let params = new URLSearchParams(document.location.search);
+	if (params.get("alarm"))
+	{
+		var audio = new Audio('/static/beep.wav');
+		audio.play();
+	}
+}
+
+
 function loadUpdate(event)
 {
 	fetch('/srt.json').then((response) => response.json())
@@ -88,23 +145,13 @@ function loadUpdate(event)
 		for (const title of data) {
 			if ( !times.includes(title["start"]))
 			{
-				times.push(title["start"]);
-				t = new Title(start=title["start"],end=title["end"],text=title["text"])
-				titles=document.getElementById('titles');
-				titles.insertBefore(t.element(), titles.firstChild);
-
-				let params = new URLSearchParams(document.location.search);
-				if (params.get("alarm"))
-				{
-					var audio = new Audio('/static/beep.wav');
-					audio.play();
-				}
+				add_title(title)
 			}
 		}
 	});
 
 
-	setTimeout(loadUpdate, 1000);
+	//setTimeout(loadUpdate, 10000);
 }
 window.addEventListener("load", loadUpdate);
 

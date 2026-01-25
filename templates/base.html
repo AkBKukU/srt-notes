@@ -3,7 +3,8 @@
 	<title> SRT Notes: {{ data["srt-name"] }} </title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta name="HandheldFriendly" content="true" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<script type="text/javascript" src="{{ url_for('static', filename='data.js') }}"></script>
 
   {% block head %}{% endblock %}
 
