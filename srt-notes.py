@@ -23,7 +23,7 @@ try:
     from quart import render_template
     from quart import send_from_directory
 except Exception as e:
-        print("Need to install Python module [flask]")
+        print("Need to install Python module [quart]")
         sys.exit(1)
 
 from srt import SRT, Title
@@ -118,26 +118,6 @@ def create_app(args):
     return app
 
 # ------ Async Server Handler ------
-
-
-
-async def startWeb(ip,port,srt):
-
-    # Internal Modules
-    global server
-    server = WebInterface(ip,port,srt)
-
-    """ Start connections to async modules """
-
-    # Setup CTRL-C signal to end programm
-    signal.signal(signal.SIGINT, exit_handler)
-    print('Press Ctrl+C to exit program')
-
-    # Start async modules
-    L = await asyncio.gather(
-        server.start(),
-        asyncLoop()
-    )
 
 
 
