@@ -1,6 +1,10 @@
 
 class WebSocketCustom extends WebSocketHandler
 {
+constructor(address="ws://localhost:5000/ws") {
+	super(address);
+	console.log(this.ws)
+}
 websocket_message(data)
 {
     try {
@@ -28,6 +32,13 @@ websocket_message(data)
     }
 }
 
+keepalive()
+{
+	console.log(this.ws)
+	this.sendEvent("keepalive");
+	setTimeout(this.keepalive.bind(this),10000)
+}
+
 }
 
 
@@ -37,6 +48,7 @@ const socket = new WebSocketCustom("/ws");
 
 
 
+setTimeout(socket.keepalive.bind(socket),1000)
 
 times=[]
 

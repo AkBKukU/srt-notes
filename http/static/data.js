@@ -129,6 +129,7 @@ websocket_message(data)
 
 }
 
+
 /*
  * Send formated event data to WebSocket server
  */
