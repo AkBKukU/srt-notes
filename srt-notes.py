@@ -39,7 +39,7 @@ args=None
 def create_app(args):
 
     host_dir=os.path.realpath(__file__).replace(os.path.basename(__file__),"")
-    app = Quart("SRT Notes")
+    app = Quart("SRT Notes",template_folder=host_dir+"/templates")
     app.logger.disabled = True
     #log = logging.getLogger('werkzeug')
     #log.disabled = True
