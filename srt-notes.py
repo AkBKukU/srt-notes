@@ -100,8 +100,6 @@ def create_app(args):
         data = await ( request.get_json() )
         pprint(data)
         start=Title.srtToDatetime(data['start'])
-        srt.remove(start=start)
-        srt.save()
 
         try:
             await wsc.websocket_broadcast({
@@ -110,6 +108,8 @@ def create_app(args):
             })
         except Exception as e:
              print(e)
+        srt.remove(start=start)
+        srt.save()
         return "sure"
 
     @app.route("/srt.json")

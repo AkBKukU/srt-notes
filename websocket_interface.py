@@ -51,6 +51,7 @@ class WebSocketHandler(object):
         :param data: dict of data to send as payload
         :return: returns nothing
         """
+        print(f"Sending: {event}:{data}" )
         await self.ws.send(json.dumps(
             {
                 "uuid":self.uuid.hex,

@@ -21,14 +21,14 @@ websocket_message(data)
 				break;
 			case "remove":
 				console.log("Upate: "+data.data.srt);
-				update_title(data.data.srt)
+				remove_title(data.data.srt)
 				break;
 			default:
 				console.log(`Command not found ${data.data.command}.`);
 		}
         }
     } catch (error) {
-        alert("thing go bad");
+        alert(error);
     }
 }
 
@@ -94,7 +94,7 @@ class Title {
 			body: JSON.stringify({"start":event.target.name}),
 			}).then(() => {
 				// Do nothing
-				document.getElementById("form-"+event.target.name).remove();
+				//document.getElementById("form-"+event.target.name).remove();
 			});
 		};
 		h5.appendChild(a);
@@ -140,7 +140,7 @@ function update_title(title)
 
 function remove_title(title)
 {
-	document.getElementById("form"+title["start"]).remove();
+	document.getElementById("form-"+title["start"]).remove();
 }
 
 function add_title(title)
