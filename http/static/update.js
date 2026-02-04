@@ -77,10 +77,10 @@ class Title {
 		form.id="form-"+this.start;
 		var h5 = document.createElement("h5");
 		var span = document.createElement("span");
-		span.innerText = this.start + " - ";
+		span.innerText = this.start;
 		h5.appendChild(span);
 		var a = document.createElement("a");
-		a.innerText = "Remove";
+		a.innerText = "X";
 		a.name=this.start;
 		a.classList.add("remove");
 		a.onclick = function(event) {
