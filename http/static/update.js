@@ -15,6 +15,10 @@ websocket_message(data)
 				console.log("Upate: "+data.data.srt);
 				update_title(data.data.srt)
 				break;
+			case "remove":
+				console.log("Upate: "+data.data.srt);
+				update_title(data.data.srt)
+				break;
 			default:
 				console.log(`Command not found ${data.data.command}.`);
 		}
@@ -120,6 +124,11 @@ class Title {
 function update_title(title)
 {
 	document.getElementById("text"+title["start"]).value = title["text"];
+}
+
+function remove_title(title)
+{
+	document.getElementById("form"+title["start"]).remove();
 }
 
 function add_title(title)
