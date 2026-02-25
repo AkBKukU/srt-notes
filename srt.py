@@ -129,7 +129,7 @@ class Title(object):
         return datetime.datetime.strptime(srt_time,"%H:%M:%S,%f")
 
     def datetimeToSrt(dt):
-        return str(dt.time()).replace(".",",")[:12]
+        return dt.strftime("%H:%M:%S,%f").replace(".",",")[:12]
 
     def toString(self):
         return f'{Title.datetimeToSrt(self.start)} --> {Title.datetimeToSrt(self.end)}\n{self.text}\n'
