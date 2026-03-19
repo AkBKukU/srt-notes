@@ -150,10 +150,20 @@ function add_title(title)
 	titles=document.getElementById('titles');
 	titles.insertBefore(t.element(), titles.firstChild);
 
+	sound = "beep.wav"
+
+	for ( const shortcut of shortcuts)
+	{
+		if (shortcut["text"] == title["text"])
+		{
+			sound = shortcut["sound"]
+		}
+	}
+
 	let params = new URLSearchParams(document.location.search);
 	if (params.get("alarm"))
 	{
-		var audio = new Audio('/static/beep.wav');
+		var audio = new Audio('/static/sound/'+sound);
 		audio.play();
 	}
 }
@@ -164,7 +174,7 @@ function buildShortcuts(sc)
 	shortcuts = sc
 	console.log(sc)
 	var sc_elm = document.getElementById("shortcuts")
-	for ( const shortcut in sc)
+	for ( const shortcut of sc)
 	{
 
 		var input = document.createElement("input");
@@ -175,7 +185,7 @@ function buildShortcuts(sc)
 		input.id="shortcut-"+shortcut.text;
 		input.onclick = function(event) {
 			console.log(event.target.name);
-			fetch("/update", {
+			fetch("/add", {
 				method: 'post',
 		 headers: {
 			 "Content-Type": "application/json",

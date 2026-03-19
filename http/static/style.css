@@ -47,6 +47,15 @@ textarea {
 	color: #fff;
 	resize: vertical;
 }
+
+div#shortcuts {
+	margin-top: 1em;
+}
+
+div#shortcuts > input {
+	margin-top: 0.25em;
+}
+
 a,
 a:link,
 a:visited
