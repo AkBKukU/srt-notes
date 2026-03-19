@@ -203,7 +203,7 @@ function buildShortcuts(sc)
 
 function loadUpdate(event)
 {
-	fetch('/srt.json').then((response) => response.json())
+	fetch('/srt.json', { cache: "no-store" }).then((response) => response.json())
 	.then((data) =>	{
 
 		for (const title of data) {
@@ -214,7 +214,7 @@ function loadUpdate(event)
 		}
 	});
 
-	fetch('/shortcuts.json').then((response) => response.json())
+	fetch('/shortcuts.json', { cache: "no-store" }).then((response) => response.json())
 	.then((data) =>	{
 		if (data.length)
 		{
