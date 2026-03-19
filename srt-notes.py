@@ -11,6 +11,7 @@ import asyncio
 import signal
 from multiprocessing import Process
 from time import sleep
+import traceback
 
 try:
     # External Modules
@@ -63,9 +64,16 @@ def create_app(args):
     @app.route("/add", methods=("GET", "POST"))
     async def add_title():
         srt = SRT(args.srt)
-        data = await ( request.get_json() )
-        pprint(data)
-        srt.add(text=data["text"])
+        try:
+            data = await ( request.get_json() )
+            if data is None:
+                text = request.args.get('text')
+                srt.add(text=text)
+            else:
+                pprint(data)
+                srt.add(text=data["text"])
+        except Exception as e:
+            traceback.print_exc()
         srt.save()
 
         await wsc.websocket_broadcast({
