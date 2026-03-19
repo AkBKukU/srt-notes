@@ -158,16 +158,57 @@ function add_title(title)
 	}
 }
 
+shortcuts=[]
+function buildShortcuts(sc)
+{
+	shortcuts = sc
+	console.log(sc)
+	var sc_elm = document.getElementById("shortcuts")
+	for ( const shortcut in sc)
+	{
+
+		var input = document.createElement("input");
+		input.type="button";
+		input.classList.add("wide");
+		input.value=shortcut.text;
+		input.name=shortcut.text;
+		input.id="shortcut-"+shortcut.text;
+		input.onclick = function(event) {
+			console.log(event.target.name);
+			fetch("/update", {
+				method: 'post',
+		 headers: {
+			 "Content-Type": "application/json",
+		 'Accept':'application/json'
+		 },
+		 body: JSON.stringify({"start":event.target.name,"text":document.getElementById("shortcut-"+event.target.name).value}),
+			}).then(() => {
+				// Do nothing
+			});
+		};
+		sc_elm.appendChild(input);
+	}
+}
+
 
 function loadUpdate(event)
 {
 	fetch('/srt.json').then((response) => response.json())
 	.then((data) =>	{
+
 		for (const title of data) {
 			if ( !times.includes(title["start"]))
 			{
 				add_title(title)
 			}
+		}
+	});
+
+	fetch('/shortcuts.json').then((response) => response.json())
+	.then((data) =>	{
+		if (data.length)
+		{
+			buildShortcuts(data)
 		}
 	});
 
