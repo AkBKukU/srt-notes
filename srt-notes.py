@@ -130,6 +130,12 @@ def create_app(args):
         pprint(data)
         return data
 
+    @app.route("/shortcuts.json")
+    async def shortcuts():
+        if args.shortcuts is not None:
+            return await send_file(args.shortcuts)
+        else:
+            return {}
 
     return app
 
@@ -165,9 +171,28 @@ def main():
     parser.add_argument('-w', '--web', help="Start web server", action='store_true')
     parser.add_argument('-i', '--ip', help="Web server listening IP", default="0.0.0.0")
     parser.add_argument('-p', '--port', help="Web server listening IP", default="5001")
+    parser.add_argument('-c', '--shortcuts', help="JSON file of shortcuts to add", default=None)
     parser.add_argument('message', help="", default=None, nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
+
+    if args.shortcuts is not None:
+        if os.path.exists(args.shortcuts):
+            with open(args.shortcuts) as s_file:
+                try:
+                    shortcut_data = json.load(s_file)
+                except Exception as e:
+                    print("Shortcut file invalid")
+                    sys.exit(1)
+
+        else:
+            sample_shortcut=[
+                    {
+                        "text":"Common Event",
+                        "sound":"beep.wav"
+                    }
+                ]
+            print(json.dumps(sample_shortcut))
 
 
     # Run web server
